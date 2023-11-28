@@ -22,8 +22,45 @@
         "command": "espruinovscode.serial.disconnect",
         "title": "Disconnect from device",
         "category": "Espruino"
+      },
+      {
+        "command": "espruinovscode.serial.sendCode",
+        "title": "Send selected code to Espruino device",
+        "category": "Espruino",
+        "when": "resourceLangId == javascript && editorHasSelection && !editorHasMultiSelection && espruinovscode.serial.connected"
+      },
+      {
+        "command": "espruinovscode.serial.sendFile",
+        "title": "Send selected file to Espruino device",
+        "category": "Espruino",
+        "when": "espruinovscode.serial.connected"
       }
-    ]
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "espruinovscode.serial.sendCode",
+          "when": "resourceLangId == javascript && editorHasSelection && !editorHasMultiSelection && espruinovscode.serial.connected"
+        },
+        {
+          "command": "espruinovscode.serial.sendFile",
+          "when": "espruinovscode.serial.connected"
+        }
+      ],
+      "editor/context": [
+        {
+          "when": "resourceLangId == javascript && editorHasSelection && !editorHasMultiSelection && espruinovscode.serial.connected",
+          "command": "espruinovscode.serial.sendCode",
+          "group": "debug"
+        }
+      ],
+      "explorer/context": [
+        {
+          "when": "espruinovscode.serial.connected",
+          "command": "espruinovscode.serial.sendFile"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

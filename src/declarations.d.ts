@@ -12,7 +12,11 @@ declare global {
   }
 
   var Espruino: {
+    callProcessor(processor: string, data: any, callback: (...args: any[]) => void): void;
     Core: {
+      CodeWriter: {
+        writeToEspruino(code: string, callback?: () => void): void;
+      },
       Env: {
         getBoardData(): { BOARD: string, VERSION: string }
       },
@@ -23,9 +27,17 @@ declare global {
         close(): void;
         write(data: string, showStatus?: boolean, callback?: () => void): void;
         startListening(callback: (data: ArrayBuffer) => void): void;
+        isConnected(): boolean
       },
       Utils: {
         getEspruinoPrompt(callback?: () => void): void;
+        executeExpression(code: string, callback: (result: string) => void): void;
+        executeStatement(code: string, callback: (result: string) => void): void;
+      }
+    },
+    Plugins: {
+      LocalModules: {
+        setCwd(cwd: string): void;
       }
     }
   }
