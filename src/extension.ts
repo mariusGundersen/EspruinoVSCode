@@ -6,6 +6,7 @@ import * as vscode from 'vscode';
 
 //@ts-ignore
 import * as espruino from "../EspruinoTools/index.js";
+import BoardTreeDataProvider from './BoardTreeDataProvider.js';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -48,12 +49,15 @@ export function activate(context: vscode.ExtensionContext) {
       Espruino.Core.Serial.setSlowWrite(true);
       try {
 
+        let boardTreeDataProvider: vscode.Disposable;
+
         await new Promise((res, rej) => Espruino.Core.Serial.open(
           selectedDevice?.port.path,
           (info) => info?.error ? rej(info.error) : res(info),
           () => {
             vscode.window.showWarningMessage(`Disconnected from ${selectedDevice.label}`);
             vscode.commands.executeCommand("setContext", "espruinovscode.serial.connected", false);
+            boardTreeDataProvider.dispose();
           }));
 
         const { BOARD, VERSION } = Espruino.Core.Env.getBoardData();
@@ -67,6 +71,8 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.executeCommand("setContext", "espruinovscode.serial.connected", true);
         Espruino.Core.Utils.getEspruinoPrompt();
 
+        boardTreeDataProvider = vscode.window.registerTreeDataProvider('espruinovscode-board', new BoardTreeDataProvider());
+
       } catch (e) {
         vscode.window.showErrorMessage(`Connection failed ${e}`);
       }
@@ -75,7 +81,6 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand('espruinovscode.serial.disconnect', async () => {
       Espruino.Core.Serial.close();
     }));
-
 
     context.subscriptions.push(vscode.commands.registerCommand('espruinovscode.serial.sendCode', async () => {
       const editor = vscode.window.activeTextEditor;
@@ -96,7 +101,7 @@ export function activate(context: vscode.ExtensionContext) {
 
       if (!selectedFile) return;
 
-      Espruino.Plugins.LocalModules.setCwd(dirname(selectedFile.fsPath));
+      Espruino.Config.SET("MODULES_CWD", dirname(selectedFile.fsPath));
 
       const file = await vscode.workspace.openTextDocument(selectedFile);
 

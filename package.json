@@ -60,7 +60,39 @@
           "command": "espruinovscode.serial.sendFile"
         }
       ]
-    }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "espruinovscode",
+          "icon": "resources/icon.svg",
+          "title": "Espruino"
+        }
+      ]
+    },
+    "views": {
+      "espruinovscode": [
+        {
+          "id": "espruinovscode-board",
+          "name": "Board"
+        },
+        {
+          "id": "espruinovscode-config",
+          "name": "Config"
+        },
+        {
+          "id": "espruinovscode-storage",
+          "name": "Storage"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "espruinovscode-board",
+        "contents": "In order to use Espruino you need to connect to a device.\n[Connect to device](command:espruinovscode.serial.connect)\nTo learn more about Espruino [see the website](https://espruino.com).",
+        "when": "!espruinovscode.serial.connected"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

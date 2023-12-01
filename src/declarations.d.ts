@@ -13,6 +13,10 @@ declare global {
 
   var Espruino: {
     callProcessor(processor: string, data: any, callback: (...args: any[]) => void): void;
+    Config: {
+      [key: string]: any
+      set(key: string, value: any): void
+    }
     Core: {
       CodeWriter: {
         writeToEspruino(code: string, callback?: () => void): void;
