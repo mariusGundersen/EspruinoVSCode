@@ -11,8 +11,14 @@ declare global {
     portName?: string
   }
 
+  interface EspruinoBoardData {
+    BOARD: string;
+    VERSION: string;
+  }
+
   var Espruino: {
-    callProcessor(processor: string, data: any, callback: (...args: any[]) => void): void;
+    callProcessor(processor: string, data: any, callback: (data: any) => void): void;
+    addProcessor(processor: string, callback: (data: any, done: (data: any) => void) => void): void;
     Config: {
       [key: string]: any
       set(key: string, value: any): void
@@ -22,7 +28,7 @@ declare global {
         writeToEspruino(code: string, callback?: () => void): void;
       },
       Env: {
-        getBoardData(): { BOARD: string, VERSION: string }
+        getBoardData(): EspruinoBoardData
       },
       Serial: {
         getPorts(callback: (ports: EspruinoPort[], shouldCallAgain: boolean) => void): void;
@@ -37,6 +43,7 @@ declare global {
         getEspruinoPrompt(callback?: () => void): void;
         executeExpression(code: string, callback: (result: string) => void): void;
         executeStatement(code: string, callback: (result: string) => void): void;
+        parseJSONish<T>(json: string): T;
       }
     },
     Plugins: {

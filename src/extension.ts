@@ -6,7 +6,10 @@ import * as vscode from 'vscode';
 
 //@ts-ignore
 import * as espruino from "../EspruinoTools/index.js";
-import BoardTreeDataProvider from './BoardTreeDataProvider.js';
+import initBoardView from './boardView.js';
+import { init } from './serial.js';
+import initStorageView from './storageView.js';
+import { initTerminal } from './terminal.js';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -20,65 +23,48 @@ export function activate(context: vscode.ExtensionContext) {
   espruino.init(() => {
     console.log('espruino init callback', Espruino);
 
-    const writeEmitter = new vscode.EventEmitter<string>();
-
-    const textDecoder = new TextDecoder('utf-8');
-    Espruino.Core.Serial.startListening(data => {
-      const text = textDecoder.decode(new Uint8Array(data), { stream: true });
-      if (text.length) {
-        writeEmitter.fire(text);
-      }
-    });
-
-    const terminal = vscode.window.createTerminal({
-      name: 'Espruino Terminal',
-      pty: {
-        onDidWrite: writeEmitter.event,
-        open: () => Espruino.Core.Serial.write('\r\n'),
-        close: () => console.log('closed terminal'),
-        handleInput: (ch: string) => Espruino.Core.Serial.write(ch)
-      }
-    });
+    context.subscriptions.push(init(
+      initBoardView(),
+      initStorageView(context),
+      initTerminal(),
+    ));
 
     context.subscriptions.push(vscode.commands.registerCommand('espruinovscode.serial.connect', async () => {
       const selectedDevice = await vscode.window.showQuickPick(getPorts(), { title: "Select device", });
 
       if (!selectedDevice) return;
 
-      Espruino.Core.Serial.close();
+      if (Espruino.Core.Serial.isConnected()) Espruino.Core.Serial.close();
       Espruino.Core.Serial.setSlowWrite(true);
-      try {
+      Espruino.Core.Serial.open(
+        selectedDevice?.port.path,
+        (info) => {
+          console.log('connect callback', info);
+          if (info?.error) {
+            vscode.window.showErrorMessage(`Connection failed ${info.error}`);
+          } else {
+            console.log('connected!');
 
-        let boardTreeDataProvider: vscode.Disposable;
+            const boardData = Espruino.Core.Env.getBoardData();
+            if (boardData.BOARD && boardData.VERSION) {
+              vscode.window.showInformationMessage(`Connected to ${selectedDevice.label} (${boardData.BOARD} ${boardData.VERSION})`);
+            } else {
+              vscode.window.showInformationMessage(`Connected to ${selectedDevice.label} (No response from board)`);
+            }
 
-        await new Promise((res, rej) => Espruino.Core.Serial.open(
-          selectedDevice?.port.path,
-          (info) => info?.error ? rej(info.error) : res(info),
-          () => {
-            vscode.window.showWarningMessage(`Disconnected from ${selectedDevice.label}`);
-            vscode.commands.executeCommand("setContext", "espruinovscode.serial.connected", false);
-            boardTreeDataProvider.dispose();
-          }));
-
-        const { BOARD, VERSION } = Espruino.Core.Env.getBoardData();
-        if (BOARD && VERSION) {
-          vscode.window.showInformationMessage(`Connected to ${selectedDevice.label} (${BOARD} ${VERSION})`);
-        } else {
-          vscode.window.showInformationMessage(`Connected to ${selectedDevice.label} (No response from board)`);
-        }
-
-        terminal.show();
-        vscode.commands.executeCommand("setContext", "espruinovscode.serial.connected", true);
-        Espruino.Core.Utils.getEspruinoPrompt();
-
-        boardTreeDataProvider = vscode.window.registerTreeDataProvider('espruinovscode-board', new BoardTreeDataProvider());
-
-      } catch (e) {
-        vscode.window.showErrorMessage(`Connection failed ${e}`);
-      }
+            vscode.commands.executeCommand("setContext", "espruinovscode.serial.connected", true);
+            Espruino.Core.Utils.getEspruinoPrompt();
+          }
+        },
+        () => {
+          console.log('disconnected');
+          vscode.window.showWarningMessage(`Disconnected from ${selectedDevice.label}`);
+          vscode.commands.executeCommand("setContext", "espruinovscode.serial.connected", false);
+        });
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('espruinovscode.serial.disconnect', async () => {
+      console.log('disconnect command called');
       Espruino.Core.Serial.close();
     }));
 
