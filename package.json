@@ -51,6 +51,10 @@
           "light": "resources/light/trash.svg",
           "dark": "resources/dark/trash.svg"
         }
+      },
+      {
+        "command": "espruinovscode.storage.downloadFile",
+        "title": "View File"
       }
     ],
     "menus": {

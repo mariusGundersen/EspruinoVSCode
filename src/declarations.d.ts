@@ -44,6 +44,9 @@ declare global {
         executeExpression(code: string, callback: (result: string) => void): void;
         executeStatement(code: string, callback: (result: string) => void): void;
         parseJSONish<T>(json: string): T;
+        downloadFile(fileName: string, callback: (result?: string) => void): void;
+        uploadFile(fileName: string, contents: string, callback: () => void): void;
+
       }
     },
     Plugins: {

@@ -5,13 +5,15 @@ export function init(...connectListeners: ConnectListener[]) {
   const disconnectListeners: (() => void)[] = [];
   Espruino.addProcessor('connected', async (info, done) => {
     console.log('connected processor', info);
-    for (const listener of connectListeners) {
-      const disconnectListener = await Promise.resolve(listener());
-      if (disconnectListener) {
-        disconnectListeners.push(disconnectListener);
+    Espruino.Core.Utils.getEspruinoPrompt(async () => {
+      for (const listener of connectListeners) {
+        const disconnectListener = await Promise.resolve(listener());
+        if (disconnectListener) {
+          disconnectListeners.push(disconnectListener);
+        }
       }
-    }
-    done(info);
+      done(info);
+    });
   });
 
   Espruino.addProcessor('disconnected', (d, done) => {
