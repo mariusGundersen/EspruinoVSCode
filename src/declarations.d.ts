@@ -1,10 +1,15 @@
 declare global {
-  interface EspruinoPort {
+  type EspruinoPort = {
     description: string,
-    path: string,
+    path: string
+  } & ({
     usb?: unknown
     unimportant?: boolean
-  }
+    type?: undefined
+  } | {
+    rssi: number,
+    type: 'bluetooth'
+  })
 
   interface EspruinoSerialConnectInfo {
     error?: string;
@@ -14,6 +19,7 @@ declare global {
   interface EspruinoBoardData {
     BOARD: string;
     VERSION: string;
+    RAM: number;
   }
 
   var Espruino: {
@@ -57,5 +63,5 @@ declare global {
   }
 }
 
-export { };
+export { }
 

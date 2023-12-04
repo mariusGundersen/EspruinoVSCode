@@ -19,11 +19,11 @@ export class BoardTreeDataProvider implements TreeDataProvider<string> {
       if (!data) return [];
 
       if (typeof data === "number") {
-        return [
+        return Number.isInteger(data) ? [
           data % 1024 === 0
             ? `${data / 1024} KiB`
             : `${data} bytes`
-        ];
+        ] : [data.toString()];
       } else {
         return data.split(',');
       }

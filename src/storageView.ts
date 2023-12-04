@@ -1,5 +1,6 @@
 import path from "path";
 import { Event, EventEmitter, ExtensionContext, TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri, commands, window, workspace } from "vscode";
+import { getIcon } from "./utils";
 
 export default function initStorageView(context: ExtensionContext) {
   const storageTreeDataProvider = new StorageTreeDataProvider();
@@ -52,10 +53,7 @@ export class StorageTreeDataProvider implements TreeDataProvider<StorageFile> {
     const treeItem = new TreeItem(file.name, TreeItemCollapsibleState.None);
 
     const icon = file.type === 'StorageFile' ? 'files' : 'file';
-    treeItem.iconPath = {
-      light: path.join(__dirname, '..', `resources/light/${icon}.svg`),
-      dark: path.join(__dirname, '..', `resources/dark/${icon}.svg`)
-    };
+    treeItem.iconPath = getIcon(icon);
 
     treeItem.tooltip = file.size + ' bytes';
 

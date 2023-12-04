@@ -7,6 +7,7 @@ import * as vscode from 'vscode';
 //@ts-ignore
 import * as espruino from "../EspruinoTools/index.js";
 import initBoardView from './boardView.js';
+import selectDevice from './selectDevice.js';
 import { init } from './serial.js';
 import initStorageView from './storageView.js';
 import { initTerminal } from './terminal.js';
@@ -30,14 +31,14 @@ export function activate(context: vscode.ExtensionContext) {
     ));
 
     context.subscriptions.push(vscode.commands.registerCommand('espruinovscode.serial.connect', async () => {
-      const selectedDevice = await vscode.window.showQuickPick(getPorts(), { title: "Select device", });
+      const selectedDevice = await selectDevice();
 
       if (!selectedDevice) return;
 
       if (Espruino.Core.Serial.isConnected()) Espruino.Core.Serial.close();
       Espruino.Core.Serial.setSlowWrite(true);
       Espruino.Core.Serial.open(
-        selectedDevice?.port.path,
+        selectedDevice.port.path,
         (info) => {
           console.log('connect callback', info);
           if (info?.error) {
@@ -101,14 +102,3 @@ export function activate(context: vscode.ExtensionContext) {
 
 // This method is called when your extension is deactivated
 export function deactivate() { }
-
-
-async function getPorts() {
-  const ports = await new Promise<EspruinoPort[]>(res => Espruino.Core.Serial.getPorts((ports) => res(ports)));
-
-  return ports.map(port => ({
-    label: port.path,
-    description: port.description,
-    port
-  }));
-}
