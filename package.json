@@ -9,8 +9,13 @@
   "categories": [
     "Other"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mariusgundersen/EspruinoVSCode.git"
+  },
   "activationEvents": [],
   "main": "./out/extension.js",
+  "icon": "resources/logo.png",
   "contributes": {
     "commands": [
       {
@@ -136,6 +141,7 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
+    "vscode:package": "vsce package",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
@@ -143,15 +149,17 @@
     "test": "node ./out/test/runTest.js"
   },
   "devDependencies": {
-    "@types/vscode": "^1.84.2",
     "@types/mocha": "^10.0.6",
     "@types/node": "18.18.13",
+    "@types/vscode": "^1.84.2",
     "@typescript-eslint/eslint-plugin": "^6.12.0",
     "@typescript-eslint/parser": "^6.12.0",
+    "@vscode/test-electron": "^2.3.8",
+    "@vscode/vsce": "^2.22.0",
     "eslint": "^8.54.0",
+    "espruino": "^0.1.54",
     "glob": "^10.3.10",
     "mocha": "^10.2.0",
-    "typescript": "^5.3.2",
-    "@vscode/test-electron": "^2.3.8"
+    "typescript": "^5.3.2"
   }
 }
