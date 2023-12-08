@@ -28,7 +28,8 @@ const buildOptions = {
   platform: 'node',
   format: 'cjs',
   sourcemap,
-  minify
+  minify,
+  loader: { ".node": "file" },
 };
 
 if (watch) {

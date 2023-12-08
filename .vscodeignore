@@ -14,3 +14,4 @@ EspruinoTools
 .gitmodules
 build.mjs
 generate-espruino.js
+generated
