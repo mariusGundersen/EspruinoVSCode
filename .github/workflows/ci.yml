@@ -39,7 +39,7 @@ jobs:
           npm_config_arch: ${{ matrix.npm_config_arch }}
       - shell: pwsh
         run: echo "target=${{ matrix.platform }}-${{ matrix.arch }}" >> $env:GITHUB_ENV
-      - run: npx @vscode/vsce package -- --target ${{ env.target }}
+      - run: npx @vscode/vsce package --target ${{ env.target }}
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ env.target }}
