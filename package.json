@@ -2,7 +2,7 @@
   "name": "espruinovscode",
   "displayName": "EspruinoVSCode",
   "description": "Espruino in VS Code",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "engines": {
     "vscode": "^1.84.0"
   },
