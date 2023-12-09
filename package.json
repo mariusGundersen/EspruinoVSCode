@@ -2,7 +2,7 @@
   "name": "espruinovscode",
   "displayName": "EspruinoVSCode",
   "description": "Espruino in VS Code",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "engines": {
     "vscode": "^1.84.0"
   },
@@ -16,6 +16,7 @@
   "activationEvents": [],
   "main": "./out/main.js",
   "icon": "resources/logo.png",
+  "publisher": "MariusGundersen",
   "contributes": {
     "commands": [
       {
