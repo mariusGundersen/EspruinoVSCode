@@ -141,7 +141,9 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "vscode:package": "vsce package",
+    "vsce:package": "vsce package",
+    "vsce:publish": "vsce publish",
+    "vsce": "vsce",
     "compile": "npm run esbuild-base -- --sourcemap",
     "watch": "npm run esbuild-base -- --sourcemap --watch",
     "pretest": "npm run compile && npm run lint",
