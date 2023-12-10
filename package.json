@@ -2,7 +2,7 @@
   "name": "espruinovscode",
   "displayName": "EspruinoVSCode",
   "description": "Espruino in VS Code",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "engines": {
     "vscode": "^1.84.0"
   },
@@ -151,6 +151,10 @@
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js"
   },
+  "dependencies": {
+    "espruino": "^0.1.54",
+    "node-pre-gyp": "^0.13.0"
+  },
   "devDependencies": {
     "@types/mocha": "^10.0.6",
     "@types/node": "18.18.13",
@@ -160,7 +164,6 @@
     "@vscode/test-electron": "^2.3.8",
     "@vscode/vsce": "^2.22.0",
     "eslint": "^8.54.0",
-    "espruino": "^0.1.54",
     "glob": "^10.3.10",
     "mocha": "^10.2.0",
     "typescript": "^5.3.2"

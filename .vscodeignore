@@ -2,9 +2,14 @@
 .vscode-test/**
 src/**
 .gitignore
+.gitmodules
 .yarnrc
 vsc-extension-quickstart.md
 **/tsconfig.json
 **/.eslintrc.json
 **/*.map
 **/*.ts
+EspruinoTools/**
+.github/**
+!node_modules/serialport/**
+!node_modules/@serialport/**

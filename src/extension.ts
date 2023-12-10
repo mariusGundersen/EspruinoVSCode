@@ -5,7 +5,7 @@ import * as vscode from 'vscode';
 
 
 //@ts-ignore
-import * as espruino from "../EspruinoTools/index.js";
+import * as espruino from "espruino";
 import initBoardView from './boardView.js';
 import selectDevice from './selectDevice.js';
 import { init } from './serial.js';
