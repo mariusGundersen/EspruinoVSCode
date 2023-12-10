@@ -14,7 +14,7 @@
     "url": "git+https://github.com/mariusgundersen/EspruinoVSCode.git"
   },
   "activationEvents": [],
-  "main": "./out/main.js",
+  "main": "./out/extension.js",
   "icon": "resources/logo.png",
   "publisher": "MariusGundersen",
   "contributes": {
@@ -145,12 +145,11 @@
     "vsce:package": "vsce package",
     "vsce:publish": "vsce publish",
     "vsce": "vsce",
-    "compile": "npm run esbuild-base -- --sourcemap",
-    "watch": "npm run esbuild-base -- --sourcemap --watch",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js",
-    "esbuild-base": "node build.mjs"
+    "test": "node ./out/test/runTest.js"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.6",
@@ -160,7 +159,6 @@
     "@typescript-eslint/parser": "^6.12.0",
     "@vscode/test-electron": "^2.3.8",
     "@vscode/vsce": "^2.22.0",
-    "esbuild": "^0.19.8",
     "eslint": "^8.54.0",
     "espruino": "^0.1.54",
     "glob": "^10.3.10",
