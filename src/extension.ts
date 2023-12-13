@@ -37,9 +37,13 @@ export function activate(context: vscode.ExtensionContext) {
 
       if (Espruino.Core.Serial.isConnected()) Espruino.Core.Serial.close();
       Espruino.Core.Serial.setSlowWrite(true);
+      const timeout = setTimeout(() => {
+        vscode.window.showWarningMessage(`Timed out to connecting to ${selectedDevice.description} (waited 10 seconds)`);
+      }, 10_000);
       Espruino.Core.Serial.open(
-        selectedDevice.port.path,
+        selectedDevice.path,
         (info) => {
+          clearTimeout(timeout);
           console.log('connect callback', info);
           if (info?.error) {
             vscode.window.showErrorMessage(`Connection failed ${info.error}`);
@@ -48,9 +52,9 @@ export function activate(context: vscode.ExtensionContext) {
 
             const boardData = Espruino.Core.Env.getBoardData();
             if (boardData.BOARD && boardData.VERSION) {
-              vscode.window.showInformationMessage(`Connected to ${selectedDevice.label} (${boardData.BOARD} ${boardData.VERSION})`);
+              vscode.window.showInformationMessage(`Connected to ${selectedDevice.description} (${boardData.BOARD} ${boardData.VERSION})`);
             } else {
-              vscode.window.showInformationMessage(`Connected to ${selectedDevice.label} (No response from board)`);
+              vscode.window.showInformationMessage(`Connected to ${selectedDevice.description} (No response from board)`);
             }
 
             vscode.commands.executeCommand("setContext", "espruinovscode.serial.connected", true);
@@ -58,8 +62,9 @@ export function activate(context: vscode.ExtensionContext) {
           }
         },
         () => {
+          clearTimeout(timeout);
           console.log('disconnected');
-          vscode.window.showWarningMessage(`Disconnected from ${selectedDevice.label}`);
+          vscode.window.showWarningMessage(`Disconnected from ${selectedDevice.description}`);
           vscode.commands.executeCommand("setContext", "espruinovscode.serial.connected", false);
         });
     }));
@@ -83,7 +88,6 @@ export function activate(context: vscode.ExtensionContext) {
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('espruinovscode.serial.sendFile', async (selectedFile?: vscode.Uri) => {
-
       selectedFile ??= vscode.window.activeTextEditor?.document.uri;
 
       if (!selectedFile) return;

@@ -9,6 +9,8 @@ declare global {
   } | {
     rssi: number,
     type: 'bluetooth'
+  } | {
+    type: 'socket'
   })
 
   interface EspruinoSerialConnectInfo {
