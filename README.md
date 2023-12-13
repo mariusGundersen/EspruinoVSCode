@@ -19,9 +19,3 @@ Settings are coming, they will map directly to Espruino configuration
 ## Known Issues
 
 This is very early stuff, many things might not work and more things have not been properly tested.
-
-## Release Notes
-
-### 1.0.0
-
-Initial release

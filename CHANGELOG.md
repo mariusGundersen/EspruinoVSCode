@@ -4,6 +4,8 @@ All notable changes to the "espruinovscode" extension will be documented in this
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
+## [0.0.7] - 2023-12-13
 
-- Initial release
+### Added
+
+- Connect to tcp/ip socket

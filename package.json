@@ -1,8 +1,8 @@
 {
   "name": "espruinovscode",
-  "displayName": "EspruinoVSCode",
+  "displayName": "Espruino",
   "description": "Espruino in VS Code",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "engines": {
     "vscode": "^1.84.0"
   },
