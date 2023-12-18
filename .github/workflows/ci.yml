@@ -40,11 +40,11 @@ jobs:
 
       - name: Get version
         id: version
-        run: echo "version=$(npx -q git-conventional-commits version)" >> $GITHUB_OUTPUT
+        run: echo "version=$(npx -q git-conventional-commits version)" >> $env:GITHUB_ENV
       - shell: pwsh
         run: echo "target=${{ matrix.platform }}-${{ matrix.arch }}" >> $env:GITHUB_ENV
       - shell: pwsh
-        run: npx @vscode/vsce package --target ${{ env.target }} --no-git-tag-version --no-update-package-json ${{ steps.version.outputs.version }}
+        run: npx @vscode/vsce package --target ${{ env.target }} --no-git-tag-version --no-update-package-json ${{ env.version }}
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ env.target }}

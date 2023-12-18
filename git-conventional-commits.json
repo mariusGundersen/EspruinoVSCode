@@ -9,7 +9,8 @@
       "test",
       "build",
       "ops",
-      "docs"
+      "docs",
+      "chore"
     ],
     "commitScopes": [],
     "releaseTagGlobPattern": "v[0-9]*.[0-9]*.[0-9]*",
