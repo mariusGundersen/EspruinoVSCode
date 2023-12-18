@@ -23,7 +23,7 @@
       "?"
     ],
     "commitScopes": [],
-    "commitIgnoreRegexPattern": "^(WIP|chore)",
+    "commitIgnoreRegexPattern": "^(WIP|chore|release)",
     "includeInvalidCommits": false,
     "headlines": {
       "feat": "Features",

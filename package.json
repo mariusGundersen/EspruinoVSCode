@@ -350,7 +350,8 @@
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+    "test": "node ./out/test/runTest.js",
+    "preversion": "npx git-conventional-commits changelog --file CHANGELOG.md && git add CHANGELOG.md"
   },
   "dependencies": {
     "espruino": "^0.1.54",

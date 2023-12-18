@@ -3,8 +3,6 @@ on:
   push:
     branches:
       - "**"
-    tags:
-      - "v*"
 
 jobs:
   build:
@@ -30,6 +28,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v3
         with:
           node-version: 14.x
@@ -37,9 +37,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           npm_config_arch: ${{ matrix.npm_config_arch }}
+
+      - name: Get version
+        id: version
+        run: echo "version=$(npx -q git-conventional-commits version)" >> $GITHUB_OUTPUT
       - shell: pwsh
         run: echo "target=${{ matrix.platform }}-${{ matrix.arch }}" >> $env:GITHUB_ENV
-      - run: npx @vscode/vsce package --target ${{ env.target }}
+      - run: npx @vscode/vsce package --target ${{ env.target }} --no-git-tag-version --no-update-package-json ${{ steps.version.outputs.version }}
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ env.target }}
@@ -48,9 +52,32 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     needs: build
-    if: success() && startsWith( github.ref, 'refs/tags/')
+    if: success() && github.ref == 'refs/heads/main'
     steps:
+      # Checkout all commits, so we get previous tags
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
       - uses: actions/download-artifact@v3
+
+      # This is needed so that we can create git tags
+      - name: Set git user
+        run: |
+          git config --local user.name "ci-bot"
+          git config --local user.email "github@clave.no"
+
+      - name: Get version
+        id: version
+        run: echo "version=$(npx -q git-conventional-commits version)" >> $GITHUB_OUTPUT
+
+      - name: Changelog
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: "npm version ${{ env.VERSION }} -m 'release: %s'"
+
       - run: npx @vscode/vsce publish --packagePath $(find . -iname *.vsix)
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
+
+      - run: "git push --follow-tags"
