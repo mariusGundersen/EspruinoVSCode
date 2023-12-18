@@ -138,7 +138,162 @@
         "contents": "In order to use Espruino you need to connect to a device.\n[Connect to device](command:espruinovscode.serial.connect)\nTo learn more about Espruino [see the website](https://espruino.com).",
         "when": "!espruinovscode.serial.connected"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Espruino",
+      "properties": {
+        "espruinovscode.communications.resetBeforeSend": {
+          "type": "boolean",
+          "default": true,
+          "description": "Reset Espruino before sending code from the editor pane?"
+        },
+        "espruinovscode.communications.storeLineNumbers": {
+          "type": "boolean",
+          "default": true,
+          "description": "Should Espruino store line numbers for each function? This uses one extra variable per function, but allows you to get source code debugging"
+        },
+        "espruinovscode.communications.envOnConnect": {
+          "type": "boolean",
+          "default": true,
+          "description": "Just after the board is connected, should we query `process.env` to find out which board we're connected to?"
+        },
+        "espruinovscode.communications.baudRate": {
+          "type": "number",
+          "enum": [
+            9600,
+            14400,
+            19200,
+            28800,
+            38400,
+            57600,
+            115200
+          ],
+          "default": 9600,
+          "description": "When connecting over serial, this is the baud rate that is used. 9600 is the default for Espruino"
+        },
+        "espruinovscode.communications.serialIgnore": {
+          "type": "string",
+          "default": "/dev/ttyS*|/dev/*.SOC|/dev/*.MALS",
+          "description": "A '|' separated list of serial port paths to ignore, eg `/dev/ttyS*|/dev/*.SOC`"
+        },
+        "espruinovscode.communications.serialFlowControl": {
+          "type": "boolean",
+          "default": true,
+          "description": "Respond to XON/XOFF flow control characters to throttle data uploads. By default Espruino sends XON/XOFF for USB and Bluetooth (on 2v05+)."
+        },
+        "espruinovscode.communications.setTimeOnWrite": {
+          "type": "boolean",
+          "default": true,
+          "description": "When sending code, set Espruino's clock to the current time"
+        },
+        "espruinovscode.communications.serialThrottleSend": {
+          "type": "number",
+          "default": 0,
+          "enum": [
+            0,
+            1,
+            2
+          ],
+          "enumItemLabels": [
+            "Auto",
+            "Always",
+            "Never"
+          ],
+          "description": "Throttle code when sending to Espruino? If you are experiencing lost characters when sending code from the Code Editor pane, this may help."
+        },
+        "espruinovscode.communications.saveOnSend": {
+          "type": "number",
+          "default": 0,
+          "enum": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "markdownEnumDescriptions": [
+            "Execute code while uploading. Use 'save()' to save a RAM image to Flash",
+            "Execute code at boot (written to .bootcde)",
+            "**USE WITH CARE** Execute code at boot, even after `reset()` (written to .bootrst)",
+            "See Save Storage File (written to `${saveStorageFile}`)"
+          ],
+          "enumItemLabels": [
+            "To RAM",
+            "To flash",
+            "To flash permanently",
+            "To storage file"
+          ],
+          "markdownDescription": "How should code be uploaded? See [espruino.com/Saving](http://www.espruino.com/Saving) for more information.\n\n**NOTE:** Avoid 'Direct to flash, even after `reset()`' for normal development - it can make it hard to recover if your code crashes the device."
+        },
+        "espruinovscode.communications.saveStorageFile": {
+          "type": "string",
+          "default": "myapp",
+          "markdownDescription": "If `Save On Send` is set to `To Storage File`, this is the name of the file to write to."
+        },
+        "espruinovscode.communications.loadStorageFile": {
+          "type": "number",
+          "default": 2,
+          "enum": [
+            0,
+            1,
+            2
+          ],
+          "enumItemLabels": [
+            "Don't load",
+            "Load default application",
+            "Load the Storage File just written to"
+          ],
+          "markdownDescription": "This applies only if saving to Flash (not RAM)"
+        },
+        "espruinovscode.minification.minificationLevel": {
+          "type": "string",
+          "default": "",
+          "enum": [
+            "",
+            "ESPRIMA",
+            "WHITESPACE_ONLY",
+            "SIMPLE_OPTIMIZATIONS",
+            "ADVANCED_OPTIMIZATIONS"
+          ],
+          "enumItemLabels": [
+            "No Minification",
+            "Esprima (offline)",
+            "Closure (online) - Whitespace Only",
+            "Closure (online) - Simple Optimizations",
+            "Closure (online) - Advanced Optimizations (not recommended)"
+          ],
+          "description": "Automatically minify code?"
+        },
+        "espruinovscode.minification.moduleMinificationLevel": {
+          "type": "string",
+          "default": "ESPRIMA",
+          "enum": [
+            "",
+            "ESPRIMA",
+            "WHITESPACE_ONLY",
+            "SIMPLE_OPTIMIZATIONS",
+            "ADVANCED_OPTIMIZATIONS"
+          ],
+          "enumItemLabels": [
+            "No Minification",
+            "Esprima (offline)",
+            "Closure (online) - Whitespace Only",
+            "Closure (online) - Simple Optimizations",
+            "Closure (online) - Advanced Optimizations (not recommended)"
+          ],
+          "description": "Automatically minify modules? Only modules with a .js extension will be minified - if a file with a .min.js extension exists then it will be used instead."
+        },
+        "espruinovscode.minification.minificationMangle": {
+          "type": "boolean",
+          "default": true,
+          "description": "Shorten variable names (when minifying with ESPRIMA)"
+        },
+        "espruinovscode.minification.pretokenise": {
+          "type": "boolean",
+          "default": false,
+          "description": "All whitespace and comments are removed and all reserved words are converted to tokens before upload. This means a faster upload, less memory used, and increased performance (+10%) at the expense of code readability."
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

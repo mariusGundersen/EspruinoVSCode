@@ -7,10 +7,12 @@ import * as vscode from 'vscode';
 //@ts-ignore
 import * as espruino from "espruino";
 import initBoardView from './boardView.js';
+import { initConfig } from './config.js';
 import selectDevice from './selectDevice.js';
 import { init } from './serial.js';
 import initStorageView from './storageView.js';
 import { initTerminal } from './terminal.js';
+
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -23,6 +25,8 @@ export function activate(context: vscode.ExtensionContext) {
 
   espruino.init(() => {
     console.log('espruino init callback', Espruino);
+
+    context.subscriptions.push(initConfig());
 
     context.subscriptions.push(init(
       initBoardView(),

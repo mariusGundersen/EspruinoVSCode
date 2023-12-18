@@ -35,6 +35,11 @@ declare global {
       CodeWriter: {
         writeToEspruino(code: string, callback?: () => void): void;
       },
+      Config: {
+        data: {
+          [key: string]: { section: string }
+        }
+      },
       Env: {
         getBoardData(): EspruinoBoardData
       },
