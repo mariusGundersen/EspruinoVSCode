@@ -61,6 +61,14 @@
       {
         "command": "espruinovscode.storage.downloadFile",
         "title": "View File"
+      },
+      {
+        "command": "espruinovscode.storage.hideHiddenFiles",
+        "title": "✓ Show hidden files"
+      },
+      {
+        "command": "espruinovscode.storage.showHiddenFiles",
+        "title": "  Show hidden files"
       }
     ],
     "menus": {
@@ -97,6 +105,14 @@
           "command": "espruinovscode.storage.delete",
           "when": "view == espruinovscode-storage",
           "group": "navigation"
+        },
+        {
+          "command": "espruinovscode.storage.hideHiddenFiles",
+          "when": "view == espruinovscode-storage && espruinovscode.storage.showHiddenFiles"
+        },
+        {
+          "command": "espruinovscode.storage.showHiddenFiles",
+          "when": "view == espruinovscode-storage && !espruinovscode.storage.showHiddenFiles"
         }
       ],
       "view/item/context": [

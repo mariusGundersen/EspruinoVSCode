@@ -7,6 +7,9 @@ export default function initStorageView(context: ExtensionContext) {
   context.subscriptions.push(commands.registerCommand('espruinovscode.storage.refresh', storageTreeDataProvider.refresh));
   context.subscriptions.push(commands.registerCommand('espruinovscode.storage.delete', storageTreeDataProvider.delete));
   context.subscriptions.push(commands.registerCommand('espruinovscode.storage.downloadFile', storageTreeDataProvider.download));
+  context.subscriptions.push(commands.registerCommand('espruinovscode.storage.showHiddenFiles', storageTreeDataProvider.toggleHiddenFiles));
+  context.subscriptions.push(commands.registerCommand('espruinovscode.storage.hideHiddenFiles', storageTreeDataProvider.toggleHiddenFiles));
+
   return async () => {
     const storageTree = window.createTreeView('espruinovscode-storage', {
       treeDataProvider: storageTreeDataProvider,
@@ -40,13 +43,18 @@ interface StorageFile {
 }
 
 export class StorageTreeDataProvider implements TreeDataProvider<StorageFile> {
-  private files: StorageFile[] = [];
+  private _showHiddenFiles = false;
+  private _files: StorageFile[] = [];
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
   readonly onDidChangeTreeData: Event<any> = this._onDidChangeTreeData.event;
   async getChildren(file?: StorageFile) {
     if (file) return [];
 
-    return this.files;
+    if (this._showHiddenFiles) {
+      return this._files;
+    } else {
+      return this._files.filter(f => !f.name.startsWith('.'));
+    }
   }
 
   getTreeItem(file: StorageFile) {
@@ -64,7 +72,7 @@ export class StorageTreeDataProvider implements TreeDataProvider<StorageFile> {
 
   refresh = async () => {
     const files = await executeExpression<string[]>(`require('Storage').list()`);
-    this.files = [];
+    this._files = [];
 
     let skipName = '';
     for (let name of files.sort()) {
@@ -72,14 +80,14 @@ export class StorageTreeDataProvider implements TreeDataProvider<StorageFile> {
         skipName = name.replace(/(.)$/, v => String.fromCharCode(v.charCodeAt(0) + 1));
       } else if (name.endsWith('\x01')) {
         name = name.slice(0, name.length - 1);
-        this.files.push({
+        this._files.push({
           name,
           type: 'StorageFile',
           size: await executeExpression<number>(`require('Storage').open(${JSON.stringify(name)}, 'r').getLength()`)
         });
         skipName = `${name}\x01`;
       } else {
-        this.files.push({
+        this._files.push({
           name,
           type: 'file',
           size: await executeExpression<number>(`require('Storage').read(${JSON.stringify(name)}).length`)
@@ -115,6 +123,12 @@ export class StorageTreeDataProvider implements TreeDataProvider<StorageFile> {
     const data = String.fromCharCode(...content);
     await new Promise<void>(res => Espruino.Core.Utils.uploadFile(name, data, res));
     await this.refresh();
+  };
+
+  toggleHiddenFiles = () => {
+    this._showHiddenFiles = !this._showHiddenFiles;
+    commands.executeCommand('setContext', 'espruinovscode.storage.showHiddenFiles', this._showHiddenFiles);
+    this._onDidChangeTreeData.fire(undefined);
   };
 }
 
