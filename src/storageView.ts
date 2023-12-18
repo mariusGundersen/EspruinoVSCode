@@ -1,14 +1,19 @@
+import { writeFile } from "fs/promises";
 import path from "path";
-import { Event, EventEmitter, ExtensionContext, TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri, commands, window, workspace } from "vscode";
+import { CancellationToken, Event, EventEmitter, ExtensionContext, TextDocumentContentProvider, TreeDataProvider, TreeItem, TreeItemCollapsibleState, Uri, commands, window, workspace } from "vscode";
 import { getIcon } from "./utils";
 
 export default function initStorageView(context: ExtensionContext) {
   const storageTreeDataProvider = new StorageTreeDataProvider();
+  const espruinoStorageDocumentContentProvider = new EspruinoStorageDocumentContentProvider();
   context.subscriptions.push(commands.registerCommand('espruinovscode.storage.refresh', storageTreeDataProvider.refresh));
   context.subscriptions.push(commands.registerCommand('espruinovscode.storage.delete', storageTreeDataProvider.delete));
-  context.subscriptions.push(commands.registerCommand('espruinovscode.storage.downloadFile', storageTreeDataProvider.download));
+  context.subscriptions.push(commands.registerCommand('espruinovscode.storage.deleteAll', storageTreeDataProvider.delete));
+  context.subscriptions.push(commands.registerCommand('espruinovscode.storage.downloadFile', storageTreeDataProvider.downloadAndSaveFile));
+  context.subscriptions.push(commands.registerCommand('espruinovscode.storage.uploadFile', storageTreeDataProvider.uploadFile));
   context.subscriptions.push(commands.registerCommand('espruinovscode.storage.showHiddenFiles', storageTreeDataProvider.toggleHiddenFiles));
   context.subscriptions.push(commands.registerCommand('espruinovscode.storage.hideHiddenFiles', storageTreeDataProvider.toggleHiddenFiles));
+  context.subscriptions.push(workspace.registerTextDocumentContentProvider("espruino", espruinoStorageDocumentContentProvider));
 
   return async () => {
     const storageTree = window.createTreeView('espruinovscode-storage', {
@@ -20,13 +25,7 @@ export default function initStorageView(context: ExtensionContext) {
           console.log(dataTransfer);
           const files = (await dataTransfer.get('text/uri-list')?.asString())?.split('\r\n');
           if (!files) return;
-          for (const file of files) {
-            console.log(file);
-            const uri = Uri.parse(file);
-            const bytes = await workspace.fs.readFile(uri);
-            console.log(uri, bytes);
-            storageTreeDataProvider.upload(path.basename(uri.path), bytes);
-          }
+          storageTreeDataProvider.upload(files.map(f => Uri.parse(f)));
         },
       }
     });
@@ -38,11 +37,12 @@ export default function initStorageView(context: ExtensionContext) {
 
 interface StorageFile {
   readonly name: string;
+  readonly uri: Uri;
   readonly type: 'StorageFile' | 'file';
   readonly size: number;
 }
 
-export class StorageTreeDataProvider implements TreeDataProvider<StorageFile> {
+class StorageTreeDataProvider implements TreeDataProvider<StorageFile> {
   private _showHiddenFiles = false;
   private _files: StorageFile[] = [];
   private _onDidChangeTreeData: EventEmitter<any> = new EventEmitter<any>();
@@ -65,7 +65,7 @@ export class StorageTreeDataProvider implements TreeDataProvider<StorageFile> {
 
     treeItem.tooltip = file.size + ' bytes';
 
-    treeItem.command = { command: 'espruinovscode.storage.downloadFile', title: "Download File", arguments: [file.name] };
+    treeItem.command = { command: 'vscode.open', title: "Open", arguments: [file.uri] };
 
     return treeItem;
   }
@@ -82,6 +82,7 @@ export class StorageTreeDataProvider implements TreeDataProvider<StorageFile> {
         name = name.slice(0, name.length - 1);
         this._files.push({
           name,
+          uri: Uri.parse(`espruino:${name}`),
           type: 'StorageFile',
           size: await executeExpression<number>(`require('Storage').open(${JSON.stringify(name)}, 'r').getLength()`)
         });
@@ -89,6 +90,7 @@ export class StorageTreeDataProvider implements TreeDataProvider<StorageFile> {
       } else {
         this._files.push({
           name,
+          uri: Uri.parse(`espruino:${name}`),
           type: 'file',
           size: await executeExpression<number>(`require('Storage').read(${JSON.stringify(name)}).length`)
         });
@@ -111,18 +113,28 @@ export class StorageTreeDataProvider implements TreeDataProvider<StorageFile> {
     await this.refresh();
   };
 
-  download = async (name: string) => {
-    const content = await new Promise(res => Espruino.Core.Utils.downloadFile(name, res)) as string | undefined;
-    if (!content) return;
-    window.showTextDocument(await workspace.openTextDocument({
-      content
-    }));
+  upload = async (files: Uri[]) => {
+    for (const uri of files) {
+      const bytes = await workspace.fs.readFile(uri);
+      console.log(uri, bytes);
+      const data = String.fromCharCode(...bytes);
+      await new Promise<void>(res => Espruino.Core.Utils.uploadFile(path.basename(uri.path), data, res));
+    }
+    await this.refresh();
   };
 
-  upload = async (name: string, content: Uint8Array) => {
-    const data = String.fromCharCode(...content);
-    await new Promise<void>(res => Espruino.Core.Utils.uploadFile(name, data, res));
-    await this.refresh();
+  uploadFile = async () => {
+    const result = await window.showOpenDialog({ canSelectMany: true });
+    if (!result) return;
+    await this.upload(result);
+  };
+
+  downloadAndSaveFile = async (file: StorageFile) => {
+    const uri = await window.showSaveDialog({ defaultUri: file.uri.with({ scheme: 'file' }) });
+    if (!uri) return;
+
+    const doc = await workspace.openTextDocument(file.uri);
+    await writeFile(uri.fsPath, doc.getText());
   };
 
   toggleHiddenFiles = () => {
@@ -131,6 +143,16 @@ export class StorageTreeDataProvider implements TreeDataProvider<StorageFile> {
     this._onDidChangeTreeData.fire(undefined);
   };
 }
+
+
+class EspruinoStorageDocumentContentProvider implements TextDocumentContentProvider {
+  onDidChange?: Event<Uri> | undefined;
+  async provideTextDocumentContent(uri: Uri, token: CancellationToken): Promise<string> {
+    const content = await new Promise<string | undefined>(res => Espruino.Core.Utils.downloadFile(uri.path, res));
+    if (!content) throw new Error("Could not open " + uri);
+    return content;
+  }
+};
 
 async function executeExpression<T>(expression: string) {
   const json = await new Promise<string>(res => Espruino.Core.Utils.executeExpression(expression, res));

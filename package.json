@@ -59,8 +59,28 @@
         }
       },
       {
+        "command": "espruinovscode.storage.deleteAll",
+        "title": "Delete all files",
+        "icon": {
+          "light": "resources/light/trash.svg",
+          "dark": "resources/dark/trash.svg"
+        }
+      },
+      {
         "command": "espruinovscode.storage.downloadFile",
-        "title": "View File"
+        "title": "Download file",
+        "icon": {
+          "light": "resources/light/cloud-download.svg",
+          "dark": "resources/dark/cloud-download.svg"
+        }
+      },
+      {
+        "command": "espruinovscode.storage.uploadFile",
+        "title": "Upload file",
+        "icon": {
+          "light": "resources/light/cloud-upload.svg",
+          "dark": "resources/dark/cloud-upload.svg"
+        }
       },
       {
         "command": "espruinovscode.storage.hideHiddenFiles",
@@ -102,7 +122,12 @@
           "group": "navigation"
         },
         {
-          "command": "espruinovscode.storage.delete",
+          "command": "espruinovscode.storage.deleteAll",
+          "when": "view == espruinovscode-storage",
+          "group": "navigation"
+        },
+        {
+          "command": "espruinovscode.storage.uploadFile",
           "when": "view == espruinovscode-storage",
           "group": "navigation"
         },
@@ -118,6 +143,11 @@
       "view/item/context": [
         {
           "command": "espruinovscode.storage.delete",
+          "when": "view == espruinovscode-storage",
+          "group": "inline"
+        },
+        {
+          "command": "espruinovscode.storage.downloadFile",
           "when": "view == espruinovscode-storage",
           "group": "inline"
         }
