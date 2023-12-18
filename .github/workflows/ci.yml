@@ -38,8 +38,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           npm_config_arch: ${{ matrix.npm_config_arch }}
 
-      - name: Get version
-        id: version
+      - shell: pwsh
         run: echo "version=$(npx -q git-conventional-commits version)" >> $env:GITHUB_ENV
       - shell: pwsh
         run: echo "target=${{ matrix.platform }}-${{ matrix.arch }}" >> $env:GITHUB_ENV
