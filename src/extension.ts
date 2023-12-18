@@ -92,7 +92,7 @@ export function activate(context: vscode.ExtensionContext) {
 
       if (!selectedFile) return;
 
-      Espruino.Config.SET("MODULES_CWD", dirname(selectedFile.fsPath));
+      Espruino.Config.set("MODULES_CWD", dirname(selectedFile.fsPath));
 
       const file = await vscode.workspace.openTextDocument(selectedFile);
 
