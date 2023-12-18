@@ -13,18 +13,18 @@ jobs:
             platform: win32
             arch: x64
             npm_config_arch: x64
-          #- os: ubuntu-latest
-          #  platform: linux
-          #  arch: x64
-          #  npm_config_arch: x64
-          #- os: ubuntu-latest
-          #  platform: alpine
-          #  arch: x64
-          #  npm_config_arch: x64
-          #- os: macos-latest
-          #  platform: darwin
-          #  arch: x64
-          #  npm_config_arch: x64
+          - os: ubuntu-latest
+            platform: linux
+            arch: x64
+            npm_config_arch: x64
+          - os: ubuntu-latest
+            platform: alpine
+            arch: x64
+            npm_config_arch: x64
+          - os: macos-latest
+            platform: darwin
+            arch: x64
+            npm_config_arch: x64
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3

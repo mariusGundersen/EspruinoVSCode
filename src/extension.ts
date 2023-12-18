@@ -26,6 +26,12 @@ export function activate(context: vscode.ExtensionContext) {
   espruino.init(() => {
     console.log('espruino init callback', Espruino);
 
+    Espruino.Core.Notifications.success = (message: string) => vscode.window.showInformationMessage(message);
+    Espruino.Core.Notifications.error = (message: string) => vscode.window.showErrorMessage(message);
+    Espruino.Core.Notifications.warning = (message: string) => vscode.window.showWarningMessage(message);
+    Espruino.Core.Notifications.info = (message: string) => vscode.window.showInformationMessage(message);
+
+
     context.subscriptions.push(initConfig());
 
     context.subscriptions.push(init(
