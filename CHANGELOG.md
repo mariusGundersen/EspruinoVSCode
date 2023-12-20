@@ -1,3 +1,11 @@
+## **0.3.0**&emsp;<sub><sup>2023-12-20 ([7b04d2e...7b04d2e](https://github.com/mariusgundersen/EspruinoVSCode/compare/7b04d2ef791ba4e46816ce4972c609c629eb2b1a...7b04d2ef791ba4e46816ce4972c609c629eb2b1a?diff=split))</sup></sub>
+
+### Features
+
+- Show progress when connecting and communicating with board ([7b04d2e](https://github.com/mariusgundersen/EspruinoVSCode/commit/7b04d2ef791ba4e46816ce4972c609c629eb2b1a))
+
+<br>
+
 ## **0.2.0**&emsp;<sub><sup>2023-12-18 ([1ecfd2d...1ecfd2d](https://github.com/mariusgundersen/EspruinoVSCode/compare/1ecfd2deb145cb0d0226571301982e5715096a94...1ecfd2deb145cb0d0226571301982e5715096a94?diff=split))</sup></sub>
 
 ### Features
