@@ -26,6 +26,8 @@ export function activate(context: vscode.ExtensionContext) {
   espruino.init(() => {
     console.log('espruino init callback', Espruino);
 
+    Espruino.awaitProcessor = (processor: string, data: any) => new Promise(res => Espruino.callProcessor(processor, data, res));
+
     Espruino.Core.Notifications.success = (message: string) => vscode.window.showInformationMessage(message);
     Espruino.Core.Notifications.error = (message: string) => vscode.window.showErrorMessage(message);
     Espruino.Core.Notifications.warning = (message: string) => vscode.window.showWarningMessage(message);
@@ -38,45 +40,32 @@ export function activate(context: vscode.ExtensionContext) {
       initBoardView(),
       initStorageView(context),
       initTerminal(),
+      initContext()
     ));
 
     context.subscriptions.push(vscode.commands.registerCommand('espruinovscode.serial.connect', async () => {
+
+      if (Espruino.Core.Serial.isConnected()) {
+        const action = await vscode.window.showWarningMessage("You are already connected to an Espruino device, do you want to disconnect from it?", "Disocnnect");
+        if (action) await vscode.commands.executeCommand("espruinovscode.serial.disconnect");
+        return;
+      }
+
       const selectedDevice = await selectDevice();
 
       if (!selectedDevice) return;
 
-      if (Espruino.Core.Serial.isConnected()) Espruino.Core.Serial.close();
       Espruino.Core.Serial.setSlowWrite(true);
-      const timeout = setTimeout(() => {
-        vscode.window.showWarningMessage(`Timed out to connecting to ${selectedDevice.description} (waited 10 seconds)`);
-      }, 10_000);
-      Espruino.Core.Serial.open(
-        selectedDevice.path,
-        (info) => {
-          clearTimeout(timeout);
-          console.log('connect callback', info);
-          if (info?.error) {
-            vscode.window.showErrorMessage(`Connection failed ${info.error}`);
-          } else {
-            console.log('connected!');
+      try {
+        await vscode.window.withProgress({
+          location: vscode.ProgressLocation.Notification,
+          title: `Connecting to ${selectedDevice.description}`
+        }, () => connect(selectedDevice, () => vscode.window.showWarningMessage(`Disconnected from ${selectedDevice.description}`)));
 
-            const boardData = Espruino.Core.Env.getBoardData();
-            if (boardData.BOARD && boardData.VERSION) {
-              vscode.window.showInformationMessage(`Connected to ${selectedDevice.description} (${boardData.BOARD} ${boardData.VERSION})`);
-            } else {
-              vscode.window.showInformationMessage(`Connected to ${selectedDevice.description} (No response from board)`);
-            }
-
-            vscode.commands.executeCommand("setContext", "espruinovscode.serial.connected", true);
-            Espruino.Core.Utils.getEspruinoPrompt();
-          }
-        },
-        () => {
-          clearTimeout(timeout);
-          console.log('disconnected');
-          vscode.window.showWarningMessage(`Disconnected from ${selectedDevice.description}`);
-          vscode.commands.executeCommand("setContext", "espruinovscode.serial.connected", false);
-        });
+        Espruino.Core.Utils.getEspruinoPrompt();
+      } catch (error: any) {
+        vscode.window.showErrorMessage(`Connection failed ${error}`);
+      }
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('espruinovscode.serial.disconnect', async () => {
@@ -106,9 +95,13 @@ export function activate(context: vscode.ExtensionContext) {
 
       const file = await vscode.workspace.openTextDocument(selectedFile);
 
-      const code = file.getText();
-      Espruino.callProcessor("transformForEspruino", code, (code: string) => {
-        Espruino.Core.CodeWriter.writeToEspruino(code);
+      await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: `Sending ${selectedFile.fsPath} to Espruino device...`,
+        cancellable: false
+      }, async () => {
+        const code = await Espruino.awaitProcessor("transformForEspruino", file.getText());
+        await new Promise<void>(res => Espruino.Core.CodeWriter.writeToEspruino(code, res));
       });
     }));
   });
@@ -116,3 +109,24 @@ export function activate(context: vscode.ExtensionContext) {
 
 // This method is called when your extension is deactivated
 export function deactivate() { }
+
+function connect({ path }: EspruinoPort, onDisconnect: () => void) {
+  const timeout = AbortSignal.timeout(10_000);
+  const connecting = new Promise<string | undefined>((resolve, reject) => Espruino.Core.Serial.open(
+    path,
+    (info) => {
+      if (timeout.aborted) reject('Timeout (10 seconds)');
+      else if (info?.error) reject(info.error);
+      else resolve(info?.portName);
+    },
+    onDisconnect));
+  return Promise.race([connecting, new Promise((_, rej) => timeout.addEventListener('abort', () => rej('Timeout (10 seconds)')))]);
+}
+
+function initContext() {
+  return async () => {
+    await vscode.commands.executeCommand("setContext", "espruinovscode.serial.connected", true);
+
+    return () => vscode.commands.executeCommand("setContext", "espruinovscode.serial.connected", false);
+  };
+}

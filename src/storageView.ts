@@ -31,7 +31,10 @@ export default function initStorageView(context: ExtensionContext) {
     });
 
     await storageTreeDataProvider.refresh();
-    return () => storageTree.dispose();
+    return () => {
+      storageTreeDataProvider.clear();
+      storageTree.dispose();
+    };
   };
 }
 
@@ -57,6 +60,11 @@ class StorageTreeDataProvider implements TreeDataProvider<StorageFile> {
     }
   }
 
+  clear() {
+    this._files = [];
+    this._onDidChangeTreeData.fire(undefined);
+  }
+
   getTreeItem(file: StorageFile) {
     const treeItem = new TreeItem(file.name, TreeItemCollapsibleState.None);
 
@@ -70,7 +78,7 @@ class StorageTreeDataProvider implements TreeDataProvider<StorageFile> {
     return treeItem;
   }
 
-  refresh = async () => {
+  refresh = () => window.withProgress({ location: { viewId: 'espruinovscode-storage' } }, async () => {
     const files = await executeExpression<string[]>(`require('Storage').list()`);
     this._files = [];
 
@@ -98,9 +106,9 @@ class StorageTreeDataProvider implements TreeDataProvider<StorageFile> {
     }
 
     this._onDidChangeTreeData.fire(undefined);
-  };
+  });
 
-  delete = async (file: StorageFile | undefined) => {
+  delete = (file: StorageFile | undefined) => window.withProgress({ location: { viewId: 'espruinovscode-storage' } }, async () => {
     if (file) {
       if (file.type === 'StorageFile') {
         await executeExpression(`require('Storage').open(${JSON.stringify(file.name)}, 'w').erase()`);
@@ -111,9 +119,9 @@ class StorageTreeDataProvider implements TreeDataProvider<StorageFile> {
       await executeExpression(`require('Storage').eraseAll()`);
     }
     await this.refresh();
-  };
+  });
 
-  upload = async (files: Uri[]) => {
+  upload = (files: Uri[]) => window.withProgress({ location: { viewId: 'espruinovscode-storage' } }, async () => {
     for (const uri of files) {
       const bytes = await workspace.fs.readFile(uri);
       console.log(uri, bytes);
@@ -121,7 +129,7 @@ class StorageTreeDataProvider implements TreeDataProvider<StorageFile> {
       await new Promise<void>(res => Espruino.Core.Utils.uploadFile(path.basename(uri.path), data, res));
     }
     await this.refresh();
-  };
+  });
 
   uploadFile = async () => {
     const result = await window.showOpenDialog({ canSelectMany: true });
@@ -147,11 +155,11 @@ class StorageTreeDataProvider implements TreeDataProvider<StorageFile> {
 
 class EspruinoStorageDocumentContentProvider implements TextDocumentContentProvider {
   onDidChange?: Event<Uri> | undefined;
-  async provideTextDocumentContent(uri: Uri, token: CancellationToken): Promise<string> {
+  provideTextDocumentContent = async (uri: Uri, token: CancellationToken): Promise<string> => window.withProgress({ location: { viewId: 'espruinovscode-storage' } }, async () => {
     const content = await new Promise<string | undefined>(res => Espruino.Core.Utils.downloadFile(uri.path, res));
     if (!content) throw new Error("Could not open " + uri);
     return content;
-  }
+  });
 };
 
 async function executeExpression<T>(expression: string) {

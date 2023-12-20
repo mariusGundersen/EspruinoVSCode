@@ -22,13 +22,15 @@
       {
         "command": "espruinovscode.serial.connect",
         "title": "Connect to device",
-        "category": "Espruino"
+        "category": "Espruino",
+        "icon": "$(debug-disconnect)"
       },
       {
         "command": "espruinovscode.serial.disconnect",
         "title": "Disconnect from device",
         "category": "Espruino",
-        "when": "espruinovscode.serial.connected"
+        "when": "espruinovscode.serial.connected",
+        "icon": "$(debug-disconnect)"
       },
       {
         "command": "espruinovscode.serial.sendCode",
@@ -45,42 +47,27 @@
       {
         "command": "espruinovscode.storage.refresh",
         "title": "Refresh",
-        "icon": {
-          "light": "resources/light/refresh.svg",
-          "dark": "resources/dark/refresh.svg"
-        }
+        "icon": "$(refresh)"
       },
       {
         "command": "espruinovscode.storage.delete",
         "title": "Delete file",
-        "icon": {
-          "light": "resources/light/trash.svg",
-          "dark": "resources/dark/trash.svg"
-        }
+        "icon": "$(trash)"
       },
       {
         "command": "espruinovscode.storage.deleteAll",
         "title": "Delete all files",
-        "icon": {
-          "light": "resources/light/trash.svg",
-          "dark": "resources/dark/trash.svg"
-        }
+        "icon": "$(trash)"
       },
       {
         "command": "espruinovscode.storage.downloadFile",
         "title": "Download file",
-        "icon": {
-          "light": "resources/light/cloud-download.svg",
-          "dark": "resources/dark/cloud-download.svg"
-        }
+        "icon": "$(cloud-download)"
       },
       {
         "command": "espruinovscode.storage.uploadFile",
         "title": "Upload file",
-        "icon": {
-          "light": "resources/light/cloud-upload.svg",
-          "dark": "resources/dark/cloud-upload.svg"
-        }
+        "icon": "$(cloud-upload)"
       },
       {
         "command": "espruinovscode.storage.hideHiddenFiles",
@@ -118,17 +105,17 @@
       "view/title": [
         {
           "command": "espruinovscode.storage.refresh",
-          "when": "view == espruinovscode-storage",
+          "when": "view == espruinovscode-storage && espruinovscode.serial.connected",
           "group": "navigation"
         },
         {
           "command": "espruinovscode.storage.deleteAll",
-          "when": "view == espruinovscode-storage",
+          "when": "view == espruinovscode-storage && espruinovscode.serial.connected",
           "group": "navigation"
         },
         {
           "command": "espruinovscode.storage.uploadFile",
-          "when": "view == espruinovscode-storage",
+          "when": "view == espruinovscode-storage && espruinovscode.serial.connected",
           "group": "navigation"
         },
         {
@@ -138,6 +125,16 @@
         {
           "command": "espruinovscode.storage.showHiddenFiles",
           "when": "view == espruinovscode-storage && !espruinovscode.storage.showHiddenFiles"
+        },
+        {
+          "command": "espruinovscode.serial.connect",
+          "when": "view == espruinovscode-board && !espruinovscode.serial.connected",
+          "group": "navigation"
+        },
+        {
+          "command": "espruinovscode.serial.disconnect",
+          "when": "view == espruinovscode-board && espruinovscode.serial.connected",
+          "group": "navigation"
         }
       ],
       "view/item/context": [

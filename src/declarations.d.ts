@@ -26,6 +26,7 @@ declare global {
 
   var Espruino: {
     callProcessor(processor: string, data: any, callback: (data: any) => void): void;
+    awaitProcessor(processor: string, data: any): Promise<any>;
     addProcessor(processor: string, callback: (data: any, done: (data: any) => void) => void): void;
     Config: {
       [key: string]: any
