@@ -91,6 +91,8 @@ export function activate(context: vscode.ExtensionContext) {
 
       if (!selectedFile) return;
 
+      if (!Espruino.Core.Serial.isConnected()) return;
+
       Espruino.Config.set("MODULES_CWD", dirname(selectedFile.fsPath));
 
       const file = await vscode.workspace.openTextDocument(selectedFile);

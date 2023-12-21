@@ -14,7 +14,7 @@ Currently it supports a limited feature set:
 
 ## Extension Settings
 
-Settings are coming, they will map directly to Espruino configuration
+Most of the Espruino configs are exposed as settings.
 
 ## Known Issues
 

@@ -42,7 +42,8 @@
         "command": "espruinovscode.serial.sendFile",
         "title": "Send selected file to Espruino device",
         "category": "Espruino",
-        "when": "espruinovscode.serial.connected"
+        "when": "espruinovscode.serial.connected",
+        "icon": "$(run)"
       },
       {
         "command": "espruinovscode.storage.refresh",
@@ -94,6 +95,13 @@
           "when": "resourceLangId == javascript && editorHasSelection && !editorHasMultiSelection && espruinovscode.serial.connected",
           "command": "espruinovscode.serial.sendCode",
           "group": "debug"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "espruinovscode.serial.sendFile",
+          "group": "navigation",
+          "when": "resourceLangId == javascript && espruinovscode.serial.connected"
         }
       ],
       "explorer/context": [

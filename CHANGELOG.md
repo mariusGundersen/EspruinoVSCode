@@ -25,17 +25,3 @@
 ### Bug Fixes
 
 - Fixed send selected file to Espruino device ([b441cf2](https://github.com/mariusgundersen/EspruinoVSCode/commit/b441cf29105ad94b5161d40902c599b5bdaf6e33))
-
-<br>
-
-# Change Log
-
-All notable changes to the "espruinovscode" extension will be documented in this file.
-
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
-
-## [0.0.7] - 2023-12-13
-
-### Added
-
-- Connect to tcp/ip socket
