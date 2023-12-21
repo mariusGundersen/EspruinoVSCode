@@ -1,3 +1,11 @@
+## **0.4.0**&emsp;<sub><sup>2023-12-21 ([8da49f4...8da49f4](https://github.com/mariusgundersen/EspruinoVSCode/compare/8da49f4787904ca1a60f216b49110a21ecf73b62...8da49f4787904ca1a60f216b49110a21ecf73b62?diff=split))</sup></sub>
+
+### Features
+
+- show icon to run on espruino in top right corner for js files ([8da49f4](https://github.com/mariusgundersen/EspruinoVSCode/commit/8da49f4787904ca1a60f216b49110a21ecf73b62))
+
+<br>
+
 ## **0.3.0**&emsp;<sub><sup>2023-12-20 ([7b04d2e...7b04d2e](https://github.com/mariusgundersen/EspruinoVSCode/compare/7b04d2ef791ba4e46816ce4972c609c629eb2b1a...7b04d2ef791ba4e46816ce4972c609c629eb2b1a?diff=split))</sup></sub>
 
 ### Features
