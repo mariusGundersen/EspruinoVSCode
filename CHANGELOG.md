@@ -1,3 +1,8 @@
+## **0.4.1**&emsp;<sub><sup>2023-12-29 ([ea57536...d4e6d59](https://github.com/mariusgundersen/EspruinoVSCode/compare/ea5753607064f337375b5e2bf3510d6a70dd7c1d...d4e6d59500199b8ca4819c0409b7ca0b2992f1c6?diff=split))</sup></sub>
+
+*no relevant changes*
+<br>
+
 ## **0.4.0**&emsp;<sub><sup>2023-12-21 ([8da49f4...8da49f4](https://github.com/mariusgundersen/EspruinoVSCode/compare/8da49f4787904ca1a60f216b49110a21ecf73b62...8da49f4787904ca1a60f216b49110a21ecf73b62?diff=split))</sup></sub>
 
 ### Features
