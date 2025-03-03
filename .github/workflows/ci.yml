@@ -27,10 +27,10 @@ jobs:
             npm_config_arch: x64
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 18.x
       - run: npm install
@@ -44,7 +44,7 @@ jobs:
         run: echo "target=${{ matrix.platform }}-${{ matrix.arch }}" >> $env:GITHUB_ENV
       - shell: pwsh
         run: npx @vscode/vsce package --target ${{ env.target }} --no-git-tag-version --no-update-package-json ${{ env.version }}
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ env.target }}
           path: "*.vsix"
@@ -55,11 +55,11 @@ jobs:
     if: success() && github.ref == 'refs/heads/main'
     steps:
       # Checkout all commits, so we get previous tags
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
 
       # This is needed so that we can create git tags
       - name: Set git user
