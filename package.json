@@ -4,7 +4,7 @@
   "description": "Espruino in VS Code",
   "version": "0.4.1",
   "engines": {
-    "vscode": "^1.84.0"
+    "vscode": "^1.97.0"
   },
   "categories": [
     "Other"
