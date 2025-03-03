@@ -344,7 +344,15 @@
           "description": "All whitespace and comments are removed and all reserved words are converted to tokens before upload. This means a faster upload, less memory used, and increased performance (+10%) at the expense of code readability."
         }
       }
-    }
+    },
+    "keybindings": [
+      {
+        "command": "espruinovscode.serial.sendCode",
+        "key": "ctrl+e,s",
+        "mac": "cmd+e,s",
+        "when": "resourceLangId == javascript && editorHasSelection && !editorHasMultiSelection && espruinovscode.serial.connected"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

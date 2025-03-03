@@ -10,6 +10,7 @@ import initBoardView from './boardView.js';
 import { initConfig } from './config.js';
 import selectDevice from './selectDevice.js';
 import { init } from './serial.js';
+import initStatusbar from './statusBar.js';
 import initStorageView from './storageView.js';
 import { initTerminal } from './terminal.js';
 
@@ -40,7 +41,8 @@ export function activate(context: vscode.ExtensionContext) {
       initBoardView(),
       initStorageView(context),
       initTerminal(),
-      initContext()
+      initContext(),
+      initStatusbar(context)
     ));
 
     context.subscriptions.push(vscode.commands.registerCommand('espruinovscode.serial.connect', async () => {
